@@ -1,0 +1,13 @@
+.build/
+build/
+dist/
+.swiftpm/
+.DS_Store
+*.xcuserstate
+.idea/
+*.xcuserdatad/
+.env
+.env.*
+__pycache__/
+*.py[cod]
+.playwright-mcp/

@@ -1,0 +1,13 @@
+#!/bin/sh
+# Require the repository owner's identity for both author and committer.
+set -eu
+for field in GIT_AUTHOR_IDENT GIT_COMMITTER_IDENT; do
+    identity=$(git var "$field")
+    case "$identity" in
+        'gslava <itic1gm@gmail.com> '*) ;;
+        *)
+            echo "Commit blocked: $field must be gslava <itic1gm@gmail.com>." >&2
+            exit 1
+            ;;
+    esac
+done

@@ -1,0 +1,79 @@
+name: Release
+
+on:
+  push:
+    tags: ['v*']
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: Existing release tag (v<major>.<minor>.<patch>)
+        required: true
+        type: string
+
+permissions:
+  contents: read
+
+concurrency:
+  group: release-${{ inputs.tag || github.ref_name }}
+  cancel-in-progress: false
+
+jobs:
+  build:
+    runs-on: macos-15
+    timeout-minutes: 30
+    env:
+      BELL_RELEASE_TAG: ${{ inputs.tag || github.ref_name }}
+      BELL_REPOSITORY: ${{ github.repository }}
+    steps:
+      - name: Check out tagged source
+        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+        with:
+          persist-credentials: false
+          fetch-depth: 0
+          ref: ${{ github.event_name == 'workflow_dispatch' && format('refs/tags/{0}', inputs.tag) || github.ref }}
+      - name: Validate tag against app version
+        run: |
+          bash scripts/check-git-identity.sh
+          bash scripts/check-release-tag.sh "$BELL_RELEASE_TAG"
+      - name: Run checks
+        run: bash scripts/check.sh --no-ui
+      - name: Build and verify Universal DMG and ZIP
+        run: |
+          bash scripts/package-release.sh
+          cp .github/RELEASE_NOTES.md dist/release-notes.md
+      - name: Save verified release files
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
+        with:
+          name: release-files
+          path: dist/
+          if-no-files-found: error
+          retention-days: 14
+
+  publish:
+    needs: build
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    permissions:
+      contents: write
+    env:
+      GH_TOKEN: ${{ github.token }}
+      GH_REPO: ${{ github.repository }}
+      BELL_RELEASE_TAG: ${{ inputs.tag || github.ref_name }}
+    steps:
+      - name: Download verified release files
+        uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093 # v4.3.0
+        with:
+          name: release-files
+          path: dist
+      - name: Verify transferred checksums and publish
+        shell: bash
+        run: |
+          set -euo pipefail
+          BELL_VERSION="${BELL_RELEASE_TAG#v}"
+          BELL_STEM="Bell-of-Mindfulness-$BELL_VERSION-universal"
+          (cd dist && sha256sum -c "$BELL_STEM.zip.sha256" "$BELL_STEM.dmg.sha256")
+          gh release create "$BELL_RELEASE_TAG" \
+            "dist/$BELL_STEM.dmg" "dist/$BELL_STEM.dmg.sha256" \
+            "dist/$BELL_STEM.zip" "dist/$BELL_STEM.zip.sha256" \
+            dist/release.json --verify-tag --title "Bell of Mindfulness $BELL_RELEASE_TAG" \
+            --notes-file dist/release-notes.md --generate-notes
