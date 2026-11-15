@@ -1,3 +1,5 @@
+Adds a custom Homebrew tap for installation and updates, checksum-verified casks, and brief Homebrew instructions in the README. Releases now include a generated cask for updating the tap after publication.
+
 Fixes a crash at midnight when macOS reports a calendar day change from a background thread. The app now updates on the main actor and continues running.
 
 Includes a regression check for background calendar notifications.

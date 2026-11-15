@@ -84,4 +84,8 @@ for extension in ("zip", "dmg"):
         "url": f"https://github.com/{repository}/releases/download/v{version}/{name}",
     }
 PY
+# Older published releases predate the downloadable Homebrew cask.
+if [ -f "$BELL_DIST/bell-of-mindfulness.rb" ]; then
+    python3 scripts/generate-homebrew-cask.py "$BELL_DIST/release.json" --output "$BELL_DIST/bell-of-mindfulness.rb" --check
+fi
 echo "Verified ZIP/DMG checksums, matching Universal apps, bundle/UI version, audio, licenses, metadata and signatures."

@@ -75,5 +75,5 @@ jobs:
           gh release create "$BELL_RELEASE_TAG" \
             "dist/$BELL_STEM.dmg" "dist/$BELL_STEM.dmg.sha256" \
             "dist/$BELL_STEM.zip" "dist/$BELL_STEM.zip.sha256" \
-            dist/release.json --verify-tag --title "Bell of Mindfulness $BELL_RELEASE_TAG" \
+            dist/release.json dist/bell-of-mindfulness.rb --verify-tag --title "Bell of Mindfulness $BELL_RELEASE_TAG" \
             --notes-file dist/release-notes.md --generate-notes

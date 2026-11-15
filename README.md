@@ -8,6 +8,22 @@ A quiet reminder to pause and return to the present. Plays a singing bowl at you
 
 ## Install
 
+With Homebrew:
+
+```sh
+brew tap gslava/bell-of-mindfulness https://github.com/gslava/Bell-of-Mindfulness.git
+brew install --cask gslava/bell-of-mindfulness/bell-of-mindfulness
+```
+
+To update, quit the app, run the following, then reopen it from Applications:
+
+```sh
+brew update
+brew upgrade --cask gslava/bell-of-mindfulness/bell-of-mindfulness
+```
+
+Or install manually:
+
 Download the latest **DMG or ZIP** from [Releases](https://github.com/gslava/Bell-of-Mindfulness/releases/latest). Open the DMG and drag **Bell of Mindfulness.app** to **Applications**, or unzip and move the app there. Launch it from Applications.
 
 > **First launch:** the app is ad-hoc signed and not notarized by Apple. If macOS blocks it, dismiss the alert. If you trust the download, open **System Settings → Privacy & Security → Open Anyway**, then confirm **Open**. See [Apple’s instructions](https://support.apple.com/en-us/102445).

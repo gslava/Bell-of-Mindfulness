@@ -38,5 +38,6 @@ manifest = dict(version=version, build=build, tag=f"v{version}", repository=repo
                 signature="ad-hoc", notarized=False, downloads=downloads)
 pathlib.Path("dist/release.json").write_text(json.dumps(manifest, indent=2) + "\n")
 PY
+python3 scripts/generate-homebrew-cask.py dist/release.json --output dist/bell-of-mindfulness.rb
 bash scripts/verify-release.sh
 echo "Prepared Universal ZIP and DMG in dist/. Nothing has been uploaded."
