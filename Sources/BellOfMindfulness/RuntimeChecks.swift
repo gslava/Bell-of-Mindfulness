@@ -1,6 +1,7 @@
 import AppKit
 import AVFoundation
 import BellCore
+import Combine
 import SwiftUI
 import Darwin
 
@@ -68,6 +69,29 @@ enum RuntimeChecks {
         check(defaults.dictionaryRepresentation().keys.contains(where: { $0.hasPrefix("bell.settings.v1.recovery.") }), "invalid settings backup preserved")
         check(Bundle.main.url(forResource: "Bell of Mindfulness", withExtension: "mp3") != nil, "audio bundled")
         check(Bundle.main.url(forResource: "AppIcon", withExtension: "icns") != nil, "icon bundled")
+        // Reproduce delivery from Foundation's background midnight notification.
+        let calendarDefaults = UserDefaults(suiteName: "\(suite).Calendar")!
+        defer { calendarDefaults.removePersistentDomain(forName: "\(suite).Calendar") }
+        let calendarStore = SettingsStore(defaults: calendarDefaults)
+        var calendarSettings = calendarStore.load()
+        calendarSettings.isEnabled = false
+        do { try calendarStore.save(calendarSettings) }
+        catch { print("FAIL: calendar check settings: \(error)"); return 1 }
+        let calendarModel = AppModel(store: calendarStore)
+        defer { calendarModel.shutdown() }
+        var calendarChangeReceived = false
+        let calendarSubscription = calendarModel.objectWillChange.sink {
+            MainActor.assumeIsolated { calendarChangeReceived = true }
+        }
+        defer { calendarSubscription.cancel() }
+        DispatchQueue.global(qos: .userInteractive).async {
+            NotificationCenter.default.post(name: .NSCalendarDayChanged, object: nil)
+        }
+        let calendarDeadline = Date().addingTimeInterval(2)
+        while !calendarChangeReceived && Date() < calendarDeadline {
+            RunLoop.main.run(until: Date().addingTimeInterval(0.01))
+        }
+        check(calendarChangeReceived, "background calendar day change updates on MainActor without crashing")
         do {
             let url = Bundle.main.url(forResource: "Bell of Mindfulness", withExtension: "mp3")!
             let file = try AVAudioFile(forReading: url)

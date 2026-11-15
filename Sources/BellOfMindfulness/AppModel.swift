@@ -241,7 +241,10 @@ final class AppModel: ObservableObject {
     @objc private func sessionResigned() { isSessionInactive = true; suspend() }
     @objc private func sessionBecameActive() { isSessionInactive = false; if !isSleeping { restart() } }
     @objc private func clockChanged() { restart() }
-    @objc private func dayChanged() { objectWillChange.send() }
+    // Calendar notifications can arrive on a background queue at midnight.
+    @objc nonisolated private func dayChanged() {
+        Task { @MainActor [weak self] in self?.objectWillChange.send() }
+    }
 
     @objc func refreshLoginStatus() { loginStatus = SMAppService.mainApp.status }
 
