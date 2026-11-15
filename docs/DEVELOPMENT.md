@@ -17,7 +17,7 @@ Edit `CFBundleShortVersionString` and increment `CFBundleVersion` in `Resources/
 The tag must match exactly. For the version currently in the plist:
 
 ```sh
-bash scripts/check-release-tag.sh v1.0.0
+bash scripts/check-release-tag.sh v1.0.1
 bash scripts/package-release.sh
 ```
 

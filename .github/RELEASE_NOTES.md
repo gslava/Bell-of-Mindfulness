@@ -1,3 +1,7 @@
+Fixes a crash at midnight when macOS reports a calendar day change from a background thread. The app now updates on the main actor and continues running.
+
+Includes a regression check for background calendar notifications.
+
 A singing bowl reminder for macOS 14 and later.
 
 - Choose the playback interval and volume.
