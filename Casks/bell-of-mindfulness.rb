@@ -1,6 +1,6 @@
 cask "bell-of-mindfulness" do
-  version "1.0.0"
-  sha256 "92c2c44dc0aa9ddd4a482ae71a376e91634ea36f19f7b5c307254a94727660fb"
+  version "1.0.2"
+  sha256 "44bdcf21c436157ee249589e24f5e7ca42b29aa4be4b8c68bd329222a8c2da05"
 
   url "https://github.com/gslava/Bell-of-Mindfulness/releases/download/v#{version}/Bell-of-Mindfulness-#{version}-universal.zip"
   name "Bell of Mindfulness"
